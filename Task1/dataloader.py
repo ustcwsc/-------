@@ -1,21 +1,42 @@
 import os
-from PIL import Image
+import random
+from PIL import Image, ImageEnhance
 import torch
 
 
-def load_images_and_labels(data_path, device):
+def augment_image(img):
+    """
+    对缺陷图像进行随机数据增强
+    """
+    # 随机翻转
+    if random.random() < 0.5:
+        img = img.transpose(Image.FLIP_LEFT_RIGHT)
+    if random.random() < 0.5:
+        img = img.transpose(Image.FLIP_TOP_BOTTOM)
+
+    # 随机旋转
+    if random.random() < 0.5:
+        angle = random.uniform(-15, 15)
+        img = img.rotate(angle)
+
+    # 亮度 / 对比度扰动
+    if random.random() < 0.5:
+        img = ImageEnhance.Brightness(img).enhance(random.uniform(0.7, 1.3))
+    if random.random() < 0.5:
+        img = ImageEnhance.Contrast(img).enhance(random.uniform(0.7, 1.3))
+
+    return img
+
+
+def load_images_and_labels(data_path, device, augment=True, defect_aug_times=4):
     """
     data_path/
       ├── img/
       └── txt/
     """
+
     img_dir = os.path.join(data_path, "img")
     txt_dir = os.path.join(data_path, "txt")
-
-    if not os.path.isdir(img_dir):
-        raise RuntimeError(f"Image directory not found: {img_dir}")
-    if not os.path.isdir(txt_dir):
-        raise RuntimeError(f"Label directory not found: {txt_dir}")
 
     data = []
     img_ext = ('.png', '.jpg', '.jpeg', '.bmp')
@@ -28,22 +49,25 @@ def load_images_and_labels(data_path, device):
         base, _ = os.path.splitext(fname)
         txt_path = os.path.join(txt_dir, base + '.txt')
 
-        # YOLO 语义：txt 存在但为空 = 无缺陷（合法样本）
-        if not os.path.exists(txt_path):
-            continue  # 或 raise，看你数据是否保证一一对应
-
-        with open(txt_path, 'r') as f:
-            lines = f.readlines()
-
-        label = 1 if len(lines) > 0 else 0
+        # 标签定义（严格按题目）
+        has_defect = os.path.exists(txt_path)
+        label = 1 if has_defect else 0
 
         img = Image.open(img_path).convert('L')
-        img = img.resize((224, 224))
 
-        pixels = torch.tensor(list(img.getdata()), dtype=torch.float32) / 255.0
-        img_tensor = pixels.view(224, 224).unsqueeze(0).to(device)
+        # 原始样本
+        def process(img_pil):
+            img_pil = img_pil.resize((224, 224))
+            pixels = torch.tensor(list(img_pil.getdata()), dtype=torch.float32) / 255.0
+            return pixels.view(1, 224, 224).to(device)
 
-        data.append((img_tensor, label))
+        data.append((process(img), label))
+
+        # 对缺陷样本进行增强式过采样
+        if augment and has_defect:
+            for _ in range(defect_aug_times):
+                aug_img = augment_image(img.copy())
+                data.append((process(aug_img), label))
 
     print(f"Loaded {len(data)} samples from {data_path}")
     return data
