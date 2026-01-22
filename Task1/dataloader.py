@@ -58,7 +58,7 @@ class DefectDataset(Dataset):
 
             self.samples.append((img_path, label, False))
 
-            if has_defect:
+            if has_defect and augment: 
                 for _ in range(defect_aug_times):
                     self.samples.append((img_path, label, True))
 

@@ -17,6 +17,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--train_data_path', type=str, required=True)
     parser.add_argument('--val_data_path', type=str, required=True)
+    parser.add_argument('--resume', type=str, default=None, help='Path to .pt file to resume from')
     args = parser.parse_args()
 
     # -------------------------------
@@ -32,21 +33,20 @@ def main():
     train_dataset = DefectDataset(args.train_data_path, augment=True)
     val_dataset = DefectDataset(args.val_data_path, augment=False)
 
-    # 保持 128，如果显存紧张(OOM)可调小到 64
     batch_size = 64
     
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
         shuffle=True,
-        num_workers=4,
+        num_workers=6,
         pin_memory=True
     )
     val_loader = DataLoader(
         val_dataset,
         batch_size=batch_size,
         shuffle=False,
-        num_workers=4,
+        num_workers=6,
         pin_memory=True
     )
 
@@ -54,7 +54,42 @@ def main():
     # 4. Initialize model
     # -------------------------------
     model = CNN(device)
+    if args.resume is not None:
+        if os.path.exists(args.resume):
+            print(f"Resuming training from {args.resume} ...")
+            # map_location 确保跨设备加载不出错
+            checkpoint = torch.load(args.resume, map_location=device)
+            
+            # 使用 try-except 块以防旧模型文件缺少某些层的参数
+            try:
+                # Block 1
+                model.conv1_weight = checkpoint['conv1_weight'].to(device)
+                model.conv1_bias = checkpoint['conv1_bias'].to(device)
+                model.c2_w = checkpoint['c2_w'].to(device)
+                model.c2_b = checkpoint['c2_b'].to(device)
 
+                # Block 2
+                model.conv2_weight = checkpoint['conv2_weight'].to(device)
+                model.conv2_bias = checkpoint['conv2_bias'].to(device)
+                model.c4_w = checkpoint['c4_w'].to(device)
+                model.c4_b = checkpoint['c4_b'].to(device)
+
+                # Block 3
+                model.c5_w = checkpoint['c5_w'].to(device)
+                model.c5_b = checkpoint['c5_b'].to(device)
+                model.c6_w = checkpoint['c6_w'].to(device)
+                model.c6_b = checkpoint['c6_b'].to(device)
+
+                # FC
+                model.fc_weight = checkpoint['fc_weight'].to(device)
+                model.fc_bias = checkpoint['fc_bias'].to(device)
+                
+                print(" >> Weights loaded successfully!")
+                
+            except KeyError as e:
+                print(f" >> Warning: Key {e} not found in checkpoint. Some layers might be initialized randomly.")
+        else:
+            print(f" >> Error: Checkpoint file {args.resume} not found!")
     # -------------------------------
     # 5. Hyperparameters (经过优化)
     # -------------------------------
@@ -103,10 +138,10 @@ def main():
 
                 # --- Forward ---
                 out = model.forward(xb)
-
+                pos_weight = 2.0
                 # --- Loss Calculation (Manual BCE) ---
                 # 添加 epsilon 防止 log(0)
-                loss = -(yb * torch.log(out + 1e-6) +
+                loss = -(pos_weight*yb * torch.log(out + 1e-6) +
                          (1 - yb) * torch.log(1 - out + 1e-6)).mean()
 
                 # --- Backward (Manual with Momentum) ---

@@ -25,7 +25,7 @@ class CNN:
         self.c6_w = init_w(64, 64, 3)
         self.c6_b = torch.zeros(64, device=device)
 
-        # === 修改点在这里 ===
+        
         # 原来是 64*28*28，现在输入320，经过3次2x2池化变成40
         self.flat_dim = 64 * 40 * 40 
         # ====================
