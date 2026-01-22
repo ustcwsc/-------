@@ -24,29 +24,29 @@ def augment_image(img):
 
     return img
 
-
 class DefectDataset(Dataset):
     def __init__(self, root, augment=True, defect_aug_times=3):
-        """
-        root/
-          ├── img/
-          └── txt/
-        """
         self.img_dir = os.path.join(root, "img")
         self.txt_dir = os.path.join(root, "txt")
 
         self.samples = []
         self.augment = augment
 
-        self.transform = transforms.Compose([
-            transforms.Resize((224, 224)),
-            transforms.ToTensor(),   # [1,224,224]
-        ])
 
-        img_files = [
-            f for f in os.listdir(self.img_dir)
-            if f.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp'))
-        ]
+        self.transform = transforms.Compose([
+            transforms.Resize((320, 320)),  # 改为 320x320
+            transforms.ToTensor(),
+        ])
+        # ====================
+
+        if not os.path.exists(self.img_dir):
+            print(f"Warning: {self.img_dir} does not exist.")
+            img_files = []
+        else:
+            img_files = [
+                f for f in os.listdir(self.img_dir)
+                if f.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp'))
+            ]
 
         for fname in img_files:
             base, _ = os.path.splitext(fname)
@@ -56,10 +56,8 @@ class DefectDataset(Dataset):
             has_defect = os.path.exists(txt_path)
             label = 1 if has_defect else 0
 
-            # 原始样本
             self.samples.append((img_path, label, False))
 
-            # 缺陷样本过采样 + 增强
             if has_defect:
                 for _ in range(defect_aug_times):
                     self.samples.append((img_path, label, True))
@@ -71,8 +69,7 @@ class DefectDataset(Dataset):
 
     def __getitem__(self, idx):
         img_path, label, do_aug = self.samples[idx]
-
-        img = Image.open(img_path).convert('L')
+        img = Image.open(img_path).convert('L') # 保持灰度读取
 
         if do_aug and self.augment:
             img = augment_image(img)
@@ -81,5 +78,3 @@ class DefectDataset(Dataset):
         label = torch.tensor(label, dtype=torch.float32)
 
         return img, label
-
-

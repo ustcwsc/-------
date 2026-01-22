@@ -1,0 +1,37 @@
+Model Hyperparameters:
+Initial Learning rate: 0.0002
+Momentum: 0.9
+Batch size: 64
+Number of epochs: 30
+
+Training process:
+Epoch 1: Loss=0.5554, Acc=0.7770, Val Precision=0.5913, Val Recall=0.1932, Val F1=0.2912
+Epoch 2: Loss=0.4886, Acc=0.8147, Val Precision=0.6190, Val Recall=0.2035, Val F1=0.3063
+Epoch 3: Loss=0.4652, Acc=0.8238, Val Precision=0.6147, Val Recall=0.3079, Val F1=0.4103
+Epoch 4: Loss=0.4537, Acc=0.8282, Val Precision=0.6999, Val Recall=0.1849, Val F1=0.2925
+Epoch 5: Loss=0.4440, Acc=0.8324, Val Precision=0.6654, Val Recall=0.2614, Val F1=0.3753
+Epoch 6: Loss=0.4323, Acc=0.8370, Val Precision=0.6748, Val Recall=0.2562, Val F1=0.3714
+Epoch 7: Loss=0.4233, Acc=0.8423, Val Precision=0.6743, Val Recall=0.3048, Val F1=0.4198
+Epoch 8: Loss=0.4201, Acc=0.8435, Val Precision=0.7425, Val Recall=0.2376, Val F1=0.3600
+Epoch 9: Loss=0.4067, Acc=0.8493, Val Precision=0.7041, Val Recall=0.3688, Val F1=0.4841
+Epoch 10: Loss=0.3991, Acc=0.8536, Val Precision=0.7436, Val Recall=0.2944, Val F1=0.4218
+Epoch 11: Loss=0.3780, Acc=0.8639, Val Precision=0.7908, Val Recall=0.2676, Val F1=0.3998
+Epoch 12: Loss=0.3710, Acc=0.8681, Val Precision=0.7815, Val Recall=0.3399, Val F1=0.4737
+Epoch 13: Loss=0.3651, Acc=0.8722, Val Precision=0.8076, Val Recall=0.3295, Val F1=0.4681
+Epoch 14: Loss=0.3583, Acc=0.8761, Val Precision=0.7825, Val Recall=0.4163, Val F1=0.5435
+Epoch 15: Loss=0.3551, Acc=0.8773, Val Precision=0.8091, Val Recall=0.4597, Val F1=0.5863
+Epoch 16: Loss=0.3483, Acc=0.8813, Val Precision=0.7918, Val Recall=0.5372, Val F1=0.6401
+Epoch 17: Loss=0.3422, Acc=0.8842, Val Precision=0.8046, Val Recall=0.4659, Val F1=0.5901
+Epoch 18: Loss=0.3456, Acc=0.8845, Val Precision=0.8231, Val Recall=0.4339, Val F1=0.5682
+Epoch 19: Loss=0.3343, Acc=0.8899, Val Precision=0.8219, Val Recall=0.4959, Val F1=0.6186
+Epoch 20: Loss=0.3326, Acc=0.8899, Val Precision=0.8355, Val Recall=0.4277, Val F1=0.5658
+Epoch 21: Loss=0.3262, Acc=0.8923, Val Precision=0.8103, Val Recall=0.5062, Val F1=0.6231
+Epoch 22: Loss=0.3213, Acc=0.8952, Val Precision=0.8031, Val Recall=0.5300, Val F1=0.6386
+Epoch 23: Loss=0.3195, Acc=0.8965, Val Precision=0.8285, Val Recall=0.4390, Val F1=0.5739
+Epoch 24: Loss=0.3191, Acc=0.8964, Val Precision=0.8290, Val Recall=0.4783, Val F1=0.6066
+Epoch 25: Loss=0.3178, Acc=0.8977, Val Precision=0.8169, Val Recall=0.5207, Val F1=0.6360
+Epoch 26: Loss=0.3188, Acc=0.8967, Val Precision=0.8262, Val Recall=0.4886, Val F1=0.6141
+Epoch 27: Loss=0.3203, Acc=0.8956, Val Precision=0.8494, Val Recall=0.4225, Val F1=0.5643
+Epoch 28: Loss=0.3179, Acc=0.8965, Val Precision=0.8137, Val Recall=0.5145, Val F1=0.6304
+Epoch 29: Loss=0.3155, Acc=0.8982, Val Precision=0.8087, Val Recall=0.5196, Val F1=0.6327
+Epoch 30: Loss=0.3180, Acc=0.8976, Val Precision=0.8284, Val Recall=0.5424, Val F1=0.6555
